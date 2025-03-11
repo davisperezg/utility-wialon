@@ -17,6 +17,13 @@ export class AppController {
     return this.appService.getHello();
   }
 
+  @Post('post')
+  async demo(@Body() body) {
+    console.log(body);
+
+    return body;
+  }
+
   @Post('whatsapp')
   async sendWhatsAppMessage(@Body() body: { to: string; message?: string }) {
     const { to, message = 'Estimado cliente esto es un mensaje de prueba' } =
