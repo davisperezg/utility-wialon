@@ -19,6 +19,7 @@ export class AppController {
 
   @Post('post')
   async demo(@Body() body) {
+    console.log(body);
     const param3 = body.param3;
     console.log(param3);
     return param3;
