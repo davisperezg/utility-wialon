@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Twilio } from 'twilio';
+import { CreateWhatsappDto } from './whatsapp/dto/create-whatsapp.dto';
 
 @Injectable()
 export class AppService {
@@ -24,7 +25,8 @@ export class AppService {
     return 'Hello World!';
   }
 
-  async sendWhatsAppMessage(to: string, message: string): Promise<any> {
+  async sendWhatsAppMessage(body: CreateWhatsappDto): Promise<any> {
+    const { to, vehicle, currentTime, location } = body;
     this.logger.log(`Intentando enviar mensaje WhatsApp a: ${to}`);
 
     try {
@@ -53,21 +55,16 @@ export class AppService {
       }
 
       // Registrar datos antes de enviar
-      this.logger.debug('Enviando mensaje con los siguientes datos.', {
-        to: formattedTo,
-        from,
-        messageLength: message.length,
-      });
+      this.logger.debug('Enviando mensaje con los siguientes datos.', body);
 
-      console.log({ to: formattedTo, from, message: message });
       // Enviar el mensaje
       const result = await this.twilioClient.messages.create({
         messagingServiceSid:
           this.configService.get<string>('TWILIO_SERVICE_SID'),
-        body: message,
         contentSid: 'HX9cccd0f9216a9e0056a775e346133f0d',
         from,
         to: formattedTo,
+        contentVariables: `{ "1": ${vehicle}; "2": ${currentTime}; "3": ${location}; }`,
       });
 
       this.logger.log(`Mensaje enviado exitosamente, SID: ${result.sid}`);

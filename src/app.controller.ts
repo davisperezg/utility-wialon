@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { AppService } from './app.service';
 import { JsonInterceptor } from './interceptors/json.interceptor';
+import { CreateWhatsappDto } from './whatsapp/dto/create-whatsapp.dto';
 
 @Controller()
 export class AppController {
@@ -29,18 +30,8 @@ export class AppController {
 
   @UseInterceptors(JsonInterceptor)
   @Post('whatsapp')
-  async sendWhatsAppMessage(@Body() body) {
-    const to = body.param1;
-    const message = body.param2;
-    console.log(body);
-    if (!to) {
-      throw new HttpException(
-        'El número de teléfono de destino es requerido',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    const result = await this.appService.sendWhatsAppMessage(to, message);
+  async sendWhatsAppMessage(@Body() body: CreateWhatsappDto) {
+    const result = await this.appService.sendWhatsAppMessage(body);
 
     if (!result.success) {
       throw new HttpException(result.error, HttpStatus.INTERNAL_SERVER_ERROR);
