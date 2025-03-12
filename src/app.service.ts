@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Twilio } from 'twilio';
 import { CreateWhatsappDto } from './whatsapp/dto/create-whatsapp.dto';
+import { MessageListInstanceCreateOptions } from 'twilio/lib/rest/api/v2010/account/message';
 
 @Injectable()
 export class AppService {
@@ -51,19 +52,22 @@ export class AppService {
         'TWILIO_PHONE_NUMBER',
       )}`;
 
-      // Registrar datos antes de enviar
-      this.logger.debug('Enviando mensaje con los siguientes datos.', body);
-
       const locationDefault =
         location?.trim() || 'https://hosting.wialon.us/?lang=es';
-      // Enviar el mensaje
-      const result = await this.twilioClient.messages.create({
+
+      const params: MessageListInstanceCreateOptions = {
         messagingServiceSid: this.serviceId,
         contentSid: 'HX9cccd0f9216a9e0056a775e346133f0d',
         from,
         to: formattedTo,
         contentVariables: `{"1":"${vehicle.trim()}","2":"${currentTime.trim()}","3":"${locationDefault}"}`,
-      });
+      };
+
+      // Registrar datos antes de enviar
+      this.logger.debug('Enviando mensaje con los siguientes datos.', params);
+
+      // Enviar el mensaje
+      const result = await this.twilioClient.messages.create(params);
 
       this.logger.log(`Mensaje enviado exitosamente, SID: ${result.sid}`);
 

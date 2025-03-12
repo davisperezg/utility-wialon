@@ -31,8 +31,9 @@ export class AppController {
   @UseInterceptors(JsonInterceptor)
   @Post('whatsapp')
   async sendWhatsAppMessage(@Body() body: CreateWhatsappDto) {
+    console.log(body);
     const result = await this.appService.sendWhatsAppMessage(body);
-
+    console.log(result);
     if (!result.success) {
       throw new HttpException(result.error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
