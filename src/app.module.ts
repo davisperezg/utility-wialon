@@ -7,7 +7,7 @@ import { WhatsappModule } from './whatsapp/whatsapp.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: `.development.env`,
+      envFilePath: `.production.env`,
       isGlobal: true,
       cache: true,
     }),

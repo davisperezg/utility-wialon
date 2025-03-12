@@ -6,15 +6,22 @@ import { CreateWhatsappDto } from './whatsapp/dto/create-whatsapp.dto';
 @Injectable()
 export class AppService {
   private readonly twilioClient: Twilio;
+  private readonly serviceId: string;
   private readonly logger = new Logger(AppService.name);
 
   constructor(private readonly configService: ConfigService) {
     const accountSid = this.configService.get<string>('TWILIO_ACCOUNT_SID');
     const authToken = this.configService.get<string>('TWILIO_AUTH_TOKEN');
+    const phoneNumber = this.configService.get<string>('TWILIO_PHONE_NUMBER');
+    this.serviceId = this.configService.get<string>('TWILIO_SERVICE_SID');
 
-    if (!accountSid || !authToken) {
-      this.logger.error('Credenciales de Twilio no configuradas correctamente');
-      throw new Error('Configuración de Twilio incompleta');
+    if (!accountSid || !authToken || !phoneNumber) {
+      this.logger.error(
+        'Credenciales de Twilio o Número de teléfono de WhatsApp no configuradas correctamente',
+      );
+      throw new Error(
+        'Configuración de Twilio o Número de teléfono de WhatsApp incompleta',
+      );
     }
 
     this.twilioClient = new Twilio(accountSid, authToken);
@@ -44,27 +51,16 @@ export class AppService {
         'TWILIO_PHONE_NUMBER',
       )}`;
 
-      if (!from) {
-        this.logger.error(
-          'Número de teléfono de WhatsApp de Twilio no configurado',
-        );
-        return {
-          success: false,
-          error: 'Configuración incompleta',
-        };
-      }
-
       // Registrar datos antes de enviar
       this.logger.debug('Enviando mensaje con los siguientes datos.', body);
 
       // Enviar el mensaje
       const result = await this.twilioClient.messages.create({
-        messagingServiceSid:
-          this.configService.get<string>('TWILIO_SERVICE_SID'),
+        messagingServiceSid: this.serviceId,
         contentSid: 'HX9cccd0f9216a9e0056a775e346133f0d',
         from,
         to: formattedTo,
-        contentVariables: `{ "1": ${vehicle}, "2": ${currentTime}, "3": ${location} }`,
+        contentVariables: `{"1":"${vehicle}","2":"${currentTime}","3":"${location}"}`,
       });
 
       this.logger.log(`Mensaje enviado exitosamente, SID: ${result.sid}`);
