@@ -40,4 +40,16 @@ export class AppController {
 
     return result;
   }
+
+  @Post('whatsapp1')
+  async sendWhatsAppMessage1(@Body() body: CreateWhatsappDto) {
+    console.log('body', body);
+    const result = await this.appService.sendWhatsAppMessage(body);
+    console.log('result', result);
+    if (!result.success) {
+      throw new HttpException(result.error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    return result;
+  }
 }
