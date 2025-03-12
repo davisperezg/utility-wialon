@@ -20,7 +20,7 @@ export class AppController {
 
   @Post('easy-notification')
   async sendWhatsAppMessage(@Body() body: CreateWhatsappDto) {
-    const result = await this.appService.sendWhatsAppMessage(body);
+    const result = await this.appService.bothModules(body);
     if (!result.success) {
       throw new HttpException(result.error, HttpStatus.INTERNAL_SERVER_ERROR);
     }

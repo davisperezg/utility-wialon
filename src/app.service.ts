@@ -34,9 +34,65 @@ export class AppService {
     return 'Hello World!';
   }
 
-  async sendWhatsAppMessage(body: CreateWhatsappDto): Promise<any> {
-    const { to, vehicle, currentTime, location, notify } = body;
-    this.logger.log(`Intentando llamar y enviar mensaje WhatsApp a: ${to}`);
+  async bothModules(body: CreateWhatsappDto): Promise<any> {
+    const { to, vehicle, notify } = body;
+
+    // Voice alert
+    switch (notify) {
+      case 'DISCONNECT':
+        await this.makeVoiceCall(
+          to,
+          `¡ALERTA! dispositivo desconectado! placa ${vehicle}`,
+        );
+        return await this.sendWhatsAppMessage(
+          body,
+          'HX71df37a69d102827ed673fe7167fe1a6',
+        );
+
+      case 'PANIC':
+        await this.makeVoiceCall(
+          to,
+          `¡EMERGENCIA! Vehículo sustraído placa ${vehicle}, tome acción de inmediato.`,
+        );
+        return await this.sendWhatsAppMessage(
+          body,
+          'HX1d88e653ad53f007f9af03909936c235',
+        );
+
+      case 'OUTGEO':
+        await this.makeVoiceCall(
+          to,
+          `¡ALERTA! Salida de geocerca detectada placa ${vehicle}.`,
+        );
+        return await this.sendWhatsAppMessage(
+          body,
+          'HX50c15c24bb2079ebb003f0aa474c72a8',
+        );
+
+      case 'SPEEDING':
+        await this.makeVoiceCall(
+          to,
+          `¡ALERTA! Por su seguridad y la de los demás, reduzca la velocidad y conduzca con precaución placa ${vehicle}.`,
+        );
+        return await this.sendWhatsAppMessage(
+          body,
+          'HXb56ecfb97f0882ca6378dc39b7535575',
+        );
+      default:
+        return {
+          success: false,
+          error: 'OTHER_NOTIFY',
+          errorCode: 404,
+        };
+    }
+  }
+
+  async sendWhatsAppMessage(
+    body: CreateWhatsappDto,
+    templateId: string,
+  ): Promise<any> {
+    const { to, vehicle, currentTime, location } = body;
+    this.logger.log(`Intentando enviar mensaje WhatsApp a: ${to}`);
 
     try {
       // Validar número de teléfono
@@ -58,16 +114,11 @@ export class AppService {
 
       const params: MessageListInstanceCreateOptions = {
         messagingServiceSid: this.serviceId,
-        contentSid: 'HX71df37a69d102827ed673fe7167fe1a6',
+        contentSid: templateId,
         from,
         to: formattedTo,
         contentVariables: `{"1":"${vehicle.trim()}","2":"${currentTime.trim()}","3":"${locationDefault}"}`,
       };
-
-      // Voice alert
-      if (notify === 'DISCONNECT') {
-        await this.makeVoiceCall(to, 'Alerta dispositivo desconectado!');
-      }
 
       // Registrar datos antes de enviar
       this.logger.debug('Enviando whatsapp con los siguientes datos.', params);
