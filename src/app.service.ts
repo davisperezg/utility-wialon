@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { Twilio } from 'twilio';
 import { CreateWhatsappDto } from './whatsapp/dto/create-whatsapp.dto';
 import { MessageListInstanceCreateOptions } from 'twilio/lib/rest/api/v2010/account/message';
+import { CallListInstanceCreateOptions } from 'twilio/lib/rest/api/v2010/account/call';
 
 @Injectable()
 export class AppService {
@@ -18,7 +19,7 @@ export class AppService {
 
     if (!accountSid || !authToken || !phoneNumber) {
       this.logger.error(
-        'Credenciales de Twilio o Número de teléfono de WhatsApp no configuradas correctamente',
+        'Credenciales de Twilio o Número de teléfono no configurados correctamente',
       );
       throw new Error(
         'Configuración de Twilio o Número de teléfono de WhatsApp incompleta',
@@ -34,8 +35,8 @@ export class AppService {
   }
 
   async sendWhatsAppMessage(body: CreateWhatsappDto): Promise<any> {
-    const { to, vehicle, currentTime, location } = body;
-    this.logger.log(`Intentando enviar mensaje WhatsApp a: ${to}`);
+    const { to, vehicle, currentTime, location, notify } = body;
+    this.logger.log(`Intentando llamar y enviar mensaje WhatsApp a: ${to}`);
 
     try {
       // Validar número de teléfono
@@ -63,13 +64,18 @@ export class AppService {
         contentVariables: `{"1":"${vehicle.trim()}","2":"${currentTime.trim()}","3":"${locationDefault}"}`,
       };
 
+      // Voice alert
+      if (notify === 'DISCONNECT') {
+        await this.makeVoiceCall(to, 'Alerta dispositivo desconectado!');
+      }
+
       // Registrar datos antes de enviar
-      this.logger.debug('Enviando mensaje con los siguientes datos.', params);
+      this.logger.debug('Enviando whatsapp con los siguientes datos.', params);
 
       // Enviar el mensaje
       const result = await this.twilioClient.messages.create(params);
 
-      this.logger.log(`Mensaje enviado exitosamente, SID: ${result.sid}`);
+      this.logger.log(`Whatsapp enviado exitosamente, SID: ${result.sid}`);
 
       return {
         success: true,
@@ -99,6 +105,65 @@ export class AppService {
     }
   }
 
+  async makeVoiceCall(to: string, message: string): Promise<any> {
+    this.logger.log(`Intentando realizar llamada a: ${to}`);
+
+    try {
+      // Validar número de teléfono
+      if (!this.isValidPhoneNumber(to)) {
+        this.logger.warn(`Número de teléfono inválido: ${to}`);
+        return {
+          success: false,
+          error: 'Número de teléfono inválido',
+        };
+      }
+
+      const from = `${this.configService.get<string>('TWILIO_PHONE_NUMBER')}`;
+
+      // Crear TwiML con manejo de posibles errores de caracteres especiales
+      const sanitizedMessage = this.sanitizeMessage(message);
+      const twiml = `<Response><Say language="es-ES">${sanitizedMessage}</Say><Pause length="1"/><Say language="es-ES">${sanitizedMessage}</Say></Response>`;
+
+      const params: CallListInstanceCreateOptions = {
+        to: to,
+        from: from,
+        twiml: twiml,
+        timeout: 15,
+      };
+
+      // Registrar datos antes de la llamada
+      this.logger.debug('Realizando llamada con los siguientes datos', params);
+
+      // Hacer la llamada con callback de status
+      const call = await this.twilioClient.calls.create(params);
+
+      this.logger.log(`Llamada iniciada exitosamente, SID: ${call.sid}`);
+
+      return {
+        success: true,
+        callId: call.sid,
+        status: call.status,
+        details: {
+          to,
+          from: from.replace(/^\+/, ''), // Ocultar el número completo por seguridad
+          timestamp: new Date().toISOString(),
+        },
+      };
+    } catch (error) {
+      this.logger.error(`Error al realizar llamada de voz: ${error.message}`, {
+        stack: error.stack,
+        errorCode: error.code,
+        to,
+      });
+
+      return {
+        success: false,
+        error: error.message,
+        errorCode: error.code || 'UNKNOWN_ERROR',
+      };
+    }
+  }
+
   private isValidPhoneNumber(phoneNumber: string): boolean {
     // Eliminar el prefijo whatsapp: si existe
     const normalizedNumber = phoneNumber.replace('whatsapp:', '');
@@ -106,5 +171,15 @@ export class AppService {
     // Validación básica: al menos 10 dígitos después de quitar caracteres no numéricos
     const digitsOnly = normalizedNumber.replace(/\D/g, '');
     return digitsOnly.length >= 10;
+  }
+
+  private sanitizeMessage(message: string): string {
+    // Reemplazar caracteres problemáticos para XML
+    return message
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
   }
 }
