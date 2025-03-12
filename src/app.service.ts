@@ -64,7 +64,7 @@ export class AppService {
         contentSid: 'HX9cccd0f9216a9e0056a775e346133f0d',
         from,
         to: formattedTo,
-        contentVariables: `{ "1": ${vehicle}; "2": ${currentTime}; "3": ${location}; }`,
+        contentVariables: `{ "1": ${vehicle}, "2": ${currentTime}, "3": ${location} }`,
       });
 
       this.logger.log(`Mensaje enviado exitosamente, SID: ${result.sid}`);
