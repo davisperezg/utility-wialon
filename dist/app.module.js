@@ -18,7 +18,7 @@ exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
             config_1.ConfigModule.forRoot({
-                envFilePath: `.development.env`,
+                envFilePath: `.production.env`,
                 isGlobal: true,
                 cache: true,
             }),

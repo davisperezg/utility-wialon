@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppController = void 0;
 const common_1 = require("@nestjs/common");
 const app_service_1 = require("./app.service");
+const json_interceptor_1 = require("./interceptors/json.interceptor");
 let AppController = class AppController {
     constructor(appService) {
         this.appService = appService;
@@ -22,8 +23,14 @@ let AppController = class AppController {
     getHello() {
         return this.appService.getHello();
     }
+    async demo(body) {
+        console.log(body);
+        return body;
+    }
     async sendWhatsAppMessage(body) {
-        const { to, message = 'Estimado cliente esto es un mensaje de prueba' } = body;
+        const to = body.param1;
+        const message = body.param2;
+        console.log(body);
         if (!to) {
             throw new common_1.HttpException('El número de teléfono de destino es requerido', common_1.HttpStatus.BAD_REQUEST);
         }
@@ -42,6 +49,15 @@ __decorate([
     __metadata("design:returntype", String)
 ], AppController.prototype, "getHello", null);
 __decorate([
+    (0, common_1.UseInterceptors)(json_interceptor_1.JsonInterceptor),
+    (0, common_1.Post)('post'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AppController.prototype, "demo", null);
+__decorate([
+    (0, common_1.UseInterceptors)(json_interceptor_1.JsonInterceptor),
     (0, common_1.Post)('whatsapp'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),

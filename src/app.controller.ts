@@ -22,14 +22,14 @@ export class AppController {
 
   @UseInterceptors(JsonInterceptor)
   @Post('post')
-  async demo(@Req() req, @Body() body) {
+  async demo(@Body() body) {
     console.log(body);
     return body;
   }
 
   @UseInterceptors(JsonInterceptor)
   @Post('whatsapp')
-  async sendWhatsAppMessage(@Body() body: { param1: string; param2?: string }) {
+  async sendWhatsAppMessage(@Body() body) {
     const to = body.param1;
     const message = body.param2;
     console.log(body);

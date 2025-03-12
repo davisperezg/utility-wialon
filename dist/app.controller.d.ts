@@ -3,8 +3,6 @@ export declare class AppController {
     private readonly appService;
     constructor(appService: AppService);
     getHello(): string;
-    sendWhatsAppMessage(body: {
-        to: string;
-        message?: string;
-    }): Promise<any>;
+    demo(body: any): Promise<any>;
+    sendWhatsAppMessage(body: any): Promise<any>;
 }
