@@ -23,7 +23,7 @@ export class AppController {
   @UseInterceptors(JsonInterceptor)
   @Post('post')
   async demo(@Req() req, @Body() body) {
-    console.log('Raw Body:', req.rawBody); // 🔍 Verifica el contenido original
+    console.log('Raw Body:', req); // 🔍 Verifica el contenido original
     console.log('Parsed Body:', body); // 🛠️ Verifica cómo se parsea el JSON
     return body;
   }
