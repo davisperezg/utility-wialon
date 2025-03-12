@@ -54,19 +54,18 @@ export class AppService {
 
       // Registrar datos antes de enviar
       this.logger.debug('Enviando mensaje con los siguientes datos.', {
-        to: 'whatsapp:+51931858465',
+        to: formattedTo,
         from,
         messageLength: message.length,
       });
 
-      const cliente = 'Davis';
-
+      console.log({ to: formattedTo, from, message: message });
       // Enviar el mensaje
       const result = await this.twilioClient.messages.create({
         messagingServiceSid:
           this.configService.get<string>('TWILIO_SERVICE_SID'),
-        body: `Estimado usuario hemos recibido una alerta de desconexion de su gps`,
-        contentSid: this.configService.get<string>('TWILIO_TEMPLATE_SID'),
+        body: message,
+        contentSid: 'HX9cccd0f9216a9e0056a775e346133f0d',
         from,
         to: 'whatsapp:+51931858465',
       });

@@ -23,16 +23,15 @@ export class AppController {
   @UseInterceptors(JsonInterceptor)
   @Post('post')
   async demo(@Req() req, @Body() body) {
-    console.log('Raw Body:', req); // 🔍 Verifica el contenido original
-    console.log('Parsed Body:', body); // 🛠️ Verifica cómo se parsea el JSON
+    console.log(body);
     return body;
   }
 
   @Post('whatsapp')
-  async sendWhatsAppMessage(@Body() body: { to: string; message?: string }) {
-    const { to, message = 'Estimado cliente esto es un mensaje de prueba' } =
-      body;
-
+  async sendWhatsAppMessage(@Body() body: { param1: string; param2?: string }) {
+    const to = body.param1;
+    const message = body.param2;
+    console.log(body);
     if (!to) {
       throw new HttpException(
         'El número de teléfono de destino es requerido',
