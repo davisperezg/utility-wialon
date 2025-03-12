@@ -19,6 +19,7 @@ export class AppController {
 
   @Post('post')
   async demo(@Body() body) {
+    JSON.stringify(body, null, 2);
     console.log(body);
     const param3 = body.param3;
     console.log(param3);
