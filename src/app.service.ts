@@ -54,13 +54,15 @@ export class AppService {
       // Registrar datos antes de enviar
       this.logger.debug('Enviando mensaje con los siguientes datos.', body);
 
+      const locationDefault =
+        location?.trim() || 'https://hosting.wialon.us/?lang=es';
       // Enviar el mensaje
       const result = await this.twilioClient.messages.create({
         messagingServiceSid: this.serviceId,
         contentSid: 'HX9cccd0f9216a9e0056a775e346133f0d',
         from,
         to: formattedTo,
-        contentVariables: `{"1":"${vehicle}","2":"${currentTime}","3":"${location}"}`,
+        contentVariables: `{"1":"${vehicle.trim()}","2":"${currentTime.trim()}","3":"${locationDefault}"}`,
       });
 
       this.logger.log(`Mensaje enviado exitosamente, SID: ${result.sid}`);
