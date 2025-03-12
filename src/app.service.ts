@@ -67,7 +67,7 @@ export class AppService {
         body: message,
         contentSid: 'HX9cccd0f9216a9e0056a775e346133f0d',
         from,
-        to: 'whatsapp:+51931858465',
+        to: formattedTo,
       });
 
       this.logger.log(`Mensaje enviado exitosamente, SID: ${result.sid}`);
