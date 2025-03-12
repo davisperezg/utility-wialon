@@ -42,7 +42,7 @@ export class AppService {
       case 'DISCONNECT':
         await this.makeVoiceCall(
           to,
-          `¡ALERTA! dispositivo desconectado! placa ${vehicle}. Atentamente KEMAYGPS SATELITAL cuidando tu seguridad`,
+          `¡ALERTA! dispositivo desconectado! placa ${vehicle}. Atentamente KEMAY GPS SATELITAL cuidando tu seguridad`,
         );
         return await this.sendWhatsAppMessage(
           body,
@@ -52,7 +52,7 @@ export class AppService {
       case 'PANIC':
         await this.makeVoiceCall(
           to,
-          `¡EMERGENCIA! Boton de panico activado placa ${vehicle}, comunicarse con el conductor urgente. Atentamente KEMAYGPS SATELITAL cuidando tu seguridad.`,
+          `¡EMERGENCIA! Boton de panico activado placa ${vehicle}, comunicarse con el conductor urgente. Atentamente KEMAY GPS SATELITAL cuidando tu seguridad.`,
         );
         return await this.sendWhatsAppMessage(
           body,
@@ -62,7 +62,7 @@ export class AppService {
       case 'OUTGEO':
         await this.makeVoiceCall(
           to,
-          `¡ALERTA! Salida de geocerca detectada placa ${vehicle}. Atentamente KEMAYGPS SATELITAL cuidando tu seguridad`,
+          `¡ALERTA! Salida de geocerca detectada placa ${vehicle}. Atentamente KEMAY GPS SATELITAL cuidando tu seguridad`,
         );
         return await this.sendWhatsAppMessage(
           body,
@@ -72,7 +72,7 @@ export class AppService {
       case 'SPEEDING':
         await this.makeVoiceCall(
           to,
-          `¡ALERTA! Por su seguridad y la de los demás, reduzca la velocidad y conduzca con precaución placa ${vehicle}. Atentamente KEMAYGPS SATELITAL cuidando tu seguridad`,
+          `¡ALERTA! Por su seguridad y la de los demás, reduzca la velocidad y conduzca con precaución placa ${vehicle}. Atentamente KEMAY GPS SATELITAL cuidando tu seguridad`,
         );
         return await this.sendWhatsAppMessage(
           body,
