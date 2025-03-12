@@ -39,7 +39,7 @@ export class AppService {
         };
       }
 
-      const formattedTo = to.startsWith('whatsapp:') ? to : `whatsapp:${to}`;
+      const formattedTo = to.startsWith('whatsapp:') ? to : `whatsapp:+${to}`;
       const from = `whatsapp:${this.configService.get<string>(
         'TWILIO_PHONE_NUMBER',
       )}`;
