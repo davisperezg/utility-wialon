@@ -5,8 +5,11 @@ import {
   HttpException,
   HttpStatus,
   Post,
+  UseInterceptors,
+  Req,
 } from '@nestjs/common';
 import { AppService } from './app.service';
+import { JsonInterceptor } from './interceptors/json.interceptor';
 
 @Controller()
 export class AppController {
@@ -17,13 +20,12 @@ export class AppController {
     return this.appService.getHello();
   }
 
+  @UseInterceptors(JsonInterceptor)
   @Post('post')
-  async demo(@Body() body) {
-    console.log(JSON.stringify(body, null, 2));
-    console.log(body);
-    const param3 = body.param3;
-    console.log(param3);
-    return param3;
+  async demo(@Req() req, @Body() body) {
+    console.log('Raw Body:', req.rawBody); // 🔍 Verifica el contenido original
+    console.log('Parsed Body:', body); // 🛠️ Verifica cómo se parsea el JSON
+    return body;
   }
 
   @Post('whatsapp')
