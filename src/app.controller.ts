@@ -21,31 +21,11 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @UseInterceptors(JsonInterceptor)
-  @Post('post')
-  async demo(@Body() body) {
-    console.log(body);
-    return body;
-  }
-
-  @UseInterceptors(JsonInterceptor)
   @Post('whatsapp')
   async sendWhatsAppMessage(@Body() body: CreateWhatsappDto) {
     console.log(body);
     const result = await this.appService.sendWhatsAppMessage(body);
     console.log(result);
-    if (!result.success) {
-      throw new HttpException(result.error, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    return result;
-  }
-
-  @Post('whatsapp1')
-  async sendWhatsAppMessage1(@Body() body: CreateWhatsappDto) {
-    console.log('body', body);
-    const result = await this.appService.sendWhatsAppMessage(body);
-    console.log('result', result);
     if (!result.success) {
       throw new HttpException(result.error, HttpStatus.INTERNAL_SERVER_ERROR);
     }

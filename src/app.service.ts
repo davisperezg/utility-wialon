@@ -57,7 +57,7 @@ export class AppService {
 
       const params: MessageListInstanceCreateOptions = {
         messagingServiceSid: this.serviceId,
-        contentSid: 'HX9cccd0f9216a9e0056a775e346133f0d',
+        contentSid: 'HX71df37a69d102827ed673fe7167fe1a6',
         from,
         to: formattedTo,
         contentVariables: `{"1":"${vehicle.trim()}","2":"${currentTime.trim()}","3":"${locationDefault}"}`,
