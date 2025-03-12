@@ -27,6 +27,7 @@ export class AppController {
     return body;
   }
 
+  @UseInterceptors(JsonInterceptor)
   @Post('whatsapp')
   async sendWhatsAppMessage(@Body() body: { param1: string; param2?: string }) {
     const to = body.param1;
