@@ -42,7 +42,7 @@ export class AppService {
       case 'DISCONNECT':
         await this.makeVoiceCall(
           to,
-          `¡ALERTA! dispositivo desconectado! placa ${vehicle}`,
+          `¡ALERTA! dispositivo desconectado! placa ${vehicle}. Atentamente KEMAYGPS SATELITAL cuidando tu seguridad`,
         );
         return await this.sendWhatsAppMessage(
           body,
@@ -52,17 +52,17 @@ export class AppService {
       case 'PANIC':
         await this.makeVoiceCall(
           to,
-          `¡EMERGENCIA! Vehículo sustraído placa ${vehicle}, tome acción de inmediato.`,
+          `¡EMERGENCIA! Boton de panico activado placa ${vehicle}, comunicarse con el conductor urgente. Atentamente KEMAYGPS SATELITAL cuidando tu seguridad.`,
         );
         return await this.sendWhatsAppMessage(
           body,
-          'HX1d88e653ad53f007f9af03909936c235',
+          'HXc1a31cd1b7667ebb986ecb0988d2e72d',
         );
 
       case 'OUTGEO':
         await this.makeVoiceCall(
           to,
-          `¡ALERTA! Salida de geocerca detectada placa ${vehicle}.`,
+          `¡ALERTA! Salida de geocerca detectada placa ${vehicle}. Atentamente KEMAYGPS SATELITAL cuidando tu seguridad`,
         );
         return await this.sendWhatsAppMessage(
           body,
@@ -72,7 +72,7 @@ export class AppService {
       case 'SPEEDING':
         await this.makeVoiceCall(
           to,
-          `¡ALERTA! Por su seguridad y la de los demás, reduzca la velocidad y conduzca con precaución placa ${vehicle}.`,
+          `¡ALERTA! Por su seguridad y la de los demás, reduzca la velocidad y conduzca con precaución placa ${vehicle}. Atentamente KEMAYGPS SATELITAL cuidando tu seguridad`,
         );
         return await this.sendWhatsAppMessage(
           body,
