@@ -4,6 +4,8 @@ import { Twilio } from 'twilio';
 import { CreateWhatsappDto } from './whatsapp/dto/create-whatsapp.dto';
 import { MessageListInstanceCreateOptions } from 'twilio/lib/rest/api/v2010/account/message';
 import { CallListInstanceCreateOptions } from 'twilio/lib/rest/api/v2010/account/call';
+import { CreateCallDto } from './call/dto/create-call.dto';
+import { CreateWspCallDto } from './wsp_call/dto/create-wsp_call.dto';
 
 @Injectable()
 export class AppService {
@@ -34,50 +36,50 @@ export class AppService {
     return 'Hello World!';
   }
 
-  async bothModules(body: CreateWhatsappDto): Promise<any> {
+  async easyNotification(body: CreateWspCallDto): Promise<any> {
     const { to, vehicle, notify } = body;
 
     // Voice alert
     switch (notify) {
       case 'DISCONNECT':
-        await this.makeVoiceCall(
+        await this.makeVoiceCall({
           to,
-          `¡ALERTA! dispositivo desconectado! placa ${vehicle}. Atentamente KEMAY GPS SATELITAL cuidando tu seguridad`,
-        );
-        return await this.sendWhatsAppMessage(
-          body,
-          'HX71df37a69d102827ed673fe7167fe1a6',
-        );
+          message: `¡ALERTA! dispositivo desconectado! placa ${vehicle}. Atentamente KEMAY GPS SATELITAL cuidando tu seguridad`,
+        });
+        return await this.sendWhatsAppMessage({
+          ...body,
+          templateId: 'HX71df37a69d102827ed673fe7167fe1a6',
+        });
 
       case 'PANIC':
-        await this.makeVoiceCall(
+        await this.makeVoiceCall({
           to,
-          `¡EMERGENCIA! Boton de panico activado placa ${vehicle}, comunicarse con el conductor urgente. Atentamente KEMAY GPS SATELITAL cuidando tu seguridad.`,
-        );
-        return await this.sendWhatsAppMessage(
-          body,
-          'HXc1a31cd1b7667ebb986ecb0988d2e72d',
-        );
+          message: `¡EMERGENCIA! Boton de panico activado placa ${vehicle}, comunicarse con el conductor urgente. Atentamente KEMAY GPS SATELITAL cuidando tu seguridad.`,
+        });
+        return await this.sendWhatsAppMessage({
+          ...body,
+          templateId: 'HXc1a31cd1b7667ebb986ecb0988d2e72d',
+        });
 
       case 'OUTGEO':
-        await this.makeVoiceCall(
+        await this.makeVoiceCall({
           to,
-          `¡ALERTA! Salida de geocerca detectada placa ${vehicle}. Atentamente KEMAY GPS SATELITAL cuidando tu seguridad`,
-        );
-        return await this.sendWhatsAppMessage(
-          body,
-          'HX50c15c24bb2079ebb003f0aa474c72a8',
-        );
+          message: `¡ALERTA! Salida de geocerca detectada placa ${vehicle}. Atentamente KEMAY GPS SATELITAL cuidando tu seguridad`,
+        });
+        return await this.sendWhatsAppMessage({
+          ...body,
+          templateId: 'HX50c15c24bb2079ebb003f0aa474c72a8',
+        });
 
       case 'SPEEDING':
-        await this.makeVoiceCall(
+        await this.makeVoiceCall({
           to,
-          `¡ALERTA! Por su seguridad y la de los demás, reduzca la velocidad y conduzca con precaución placa ${vehicle}. Atentamente KEMAY GPS SATELITAL cuidando tu seguridad`,
-        );
-        return await this.sendWhatsAppMessage(
-          body,
-          'HXb56ecfb97f0882ca6378dc39b7535575',
-        );
+          message: `¡ALERTA! Por su seguridad y la de los demás, reduzca la velocidad y conduzca con precaución placa ${vehicle}. Atentamente KEMAY GPS SATELITAL cuidando tu seguridad`,
+        });
+        return await this.sendWhatsAppMessage({
+          ...body,
+          templateId: 'HXb56ecfb97f0882ca6378dc39b7535575',
+        });
       default:
         return {
           success: false,
@@ -87,11 +89,8 @@ export class AppService {
     }
   }
 
-  async sendWhatsAppMessage(
-    body: CreateWhatsappDto,
-    templateId: string,
-  ): Promise<any> {
-    const { to, vehicle, currentTime, location } = body;
+  async sendWhatsAppMessage(body: CreateWhatsappDto): Promise<any> {
+    const { to, vehicle, currentTime, location, templateId } = body;
     this.logger.log(`Intentando enviar mensaje WhatsApp a: ${to}`);
 
     try {
@@ -156,7 +155,8 @@ export class AppService {
     }
   }
 
-  async makeVoiceCall(to: string, message: string): Promise<any> {
+  async makeVoiceCall(body: CreateCallDto): Promise<any> {
+    const { to, message } = body;
     this.logger.log(`Intentando realizar llamada a: ${to}`);
 
     try {
