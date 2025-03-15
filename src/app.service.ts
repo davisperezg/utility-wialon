@@ -39,7 +39,6 @@ export class AppService {
   async easyNotification(body: CreateWspCallDto): Promise<any> {
     const { to, vehicle, notify } = body;
 
-    // Voice alert
     switch (notify) {
       case 'DISCONNECT':
         await this.makeVoiceCall({
@@ -61,25 +60,6 @@ export class AppService {
           templateId: 'HXc1a31cd1b7667ebb986ecb0988d2e72d',
         });
 
-      case 'OUTGEO':
-        await this.makeVoiceCall({
-          to,
-          message: `¡ALERTA! Salida de geocerca detectada placa ${vehicle}. Atentamente KEMAY GPS SATELITAL cuidando tu seguridad`,
-        });
-        return await this.sendWhatsAppMessage({
-          ...body,
-          templateId: 'HX50c15c24bb2079ebb003f0aa474c72a8',
-        });
-
-      case 'SPEEDING':
-        await this.makeVoiceCall({
-          to,
-          message: `¡ALERTA! Por su seguridad y la de los demás, reduzca la velocidad y conduzca con precaución placa ${vehicle}. Atentamente KEMAY GPS SATELITAL cuidando tu seguridad`,
-        });
-        return await this.sendWhatsAppMessage({
-          ...body,
-          templateId: 'HXb56ecfb97f0882ca6378dc39b7535575',
-        });
       default:
         return {
           success: false,
@@ -131,11 +111,7 @@ export class AppService {
         success: true,
         messageId: result.sid,
         status: result.status,
-        details: {
-          to: formattedTo,
-          from: from.replace(/^\+/, ''), // Ocultar el número completo por seguridad
-          timestamp: new Date().toISOString(),
-        },
+        timestamp: new Date().toISOString(),
       };
     } catch (error) {
       this.logger.error(
@@ -194,11 +170,7 @@ export class AppService {
         success: true,
         callId: call.sid,
         status: call.status,
-        details: {
-          to,
-          from: from.replace(/^\+/, ''), // Ocultar el número completo por seguridad
-          timestamp: new Date().toISOString(),
-        },
+        timestamp: new Date().toISOString(),
       };
     } catch (error) {
       this.logger.error(`Error al realizar llamada de voz: ${error.message}`, {

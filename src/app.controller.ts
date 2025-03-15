@@ -22,31 +22,88 @@ export class AppController {
 
   @Post('easy-notification')
   async sendNotificationMessage(@Body() body: CreateWspCallDto) {
-    const result = await this.appService.easyNotification(body);
-    if (!result.success) {
-      throw new HttpException(result.error, HttpStatus.INTERNAL_SERVER_ERROR);
+    const { to } = body;
+    const recipients = Array.isArray(to) ? to : [to]; // Convertir en array si es solo un número
+    const results = [];
+
+    for (const phone of recipients) {
+      try {
+        const EASY = await this.appService.easyNotification({
+          ...body,
+          to: phone,
+        });
+        results.push({
+          to: phone,
+          status: 'Sent',
+          response: EASY,
+        });
+      } catch (error) {
+        results.push({
+          to: phone,
+          status: 'Failed',
+          error: error.message,
+        });
+      }
     }
 
-    return result;
+    return results;
   }
 
   @Post('call-notification')
   async sendCallMessage(@Body() body: CreateCallDto) {
-    const result = await this.appService.makeVoiceCall(body);
-    if (!result.success) {
-      throw new HttpException(result.error, HttpStatus.INTERNAL_SERVER_ERROR);
+    const { to } = body;
+    const recipients = Array.isArray(to) ? to : [to]; // Convertir en array si es solo un número
+    const results = [];
+
+    for (const phone of recipients) {
+      try {
+        const CALL = await this.appService.makeVoiceCall({
+          ...body,
+          to: phone,
+        });
+        results.push({
+          to: phone,
+          status: 'Sent',
+          response: CALL,
+        });
+      } catch (error) {
+        results.push({
+          to: phone,
+          status: 'Failed',
+          error: error.message,
+        });
+      }
     }
 
-    return result;
+    return results;
   }
 
   @Post('wsp-notification')
   async sendWhatsAppMessage(@Body() body: CreateWhatsappDto) {
-    const result = await this.appService.sendWhatsAppMessage(body);
-    if (!result.success) {
-      throw new HttpException(result.error, HttpStatus.INTERNAL_SERVER_ERROR);
+    const { to } = body;
+    const recipients = Array.isArray(to) ? to : [to]; // Convertir en array si es solo un número
+    const results = [];
+
+    for (const phone of recipients) {
+      try {
+        const WSP = await this.appService.sendWhatsAppMessage({
+          ...body,
+          to: phone,
+        });
+        results.push({
+          to: phone,
+          status: 'Sent',
+          response: WSP,
+        });
+      } catch (error) {
+        results.push({
+          to: phone,
+          status: 'Failed',
+          error: error.message,
+        });
+      }
     }
 
-    return result;
+    return results;
   }
 }
