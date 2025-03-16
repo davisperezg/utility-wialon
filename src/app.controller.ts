@@ -1,11 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpException,
-  HttpStatus,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { AppService } from './app.service';
 import { CreateWhatsappDto } from './whatsapp/dto/create-whatsapp.dto';
 import { CreateCallDto } from './call/dto/create-call.dto';
@@ -25,9 +18,7 @@ export class AppController {
   async sendNotificationMessage(@Body() body: CreateWspCallDto) {
     const { to } = body;
     const recipients = Array.isArray(to) ? to : [to]; // Convertir en array si es solo un número
-    console.log(recipients);
-    const phones = recipients.filter(validarNumeroPeruano);
-    console.log(phones);
+    const phones = recipients.filter(validarNumeroPeruano); // Filtrar solo números válidos
     const results = [];
 
     for (const phone of phones) {
@@ -57,7 +48,7 @@ export class AppController {
   async sendCallMessage(@Body() body: CreateCallDto) {
     const { to } = body;
     const recipients = Array.isArray(to) ? to : [to]; // Convertir en array si es solo un número
-    const phones = recipients.filter(Boolean);
+    const phones = recipients.filter(validarNumeroPeruano); // Filtrar solo números válidos
     const results = [];
 
     for (const phone of phones) {
@@ -87,7 +78,7 @@ export class AppController {
   async sendWhatsAppMessage(@Body() body: CreateWhatsappDto) {
     const { to } = body;
     const recipients = Array.isArray(to) ? to : [to]; // Convertir en array si es solo un número
-    const phones = recipients.filter(Boolean);
+    const phones = recipients.filter(validarNumeroPeruano); // Filtrar solo números válidos
     const results = [];
 
     for (const phone of phones) {
