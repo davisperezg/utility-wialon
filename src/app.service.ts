@@ -60,6 +60,16 @@ export class AppService {
           templateId: 'HXc1a31cd1b7667ebb986ecb0988d2e72d',
         });
 
+      case 'CRASH':
+        await this.makeVoiceCall({
+          to,
+          message: `ALERTA! comportamiento inusual en el GPS que indica un posible accidente del vehículo con placa ${vehicle}, comuníquese de inmediato con el conductor, tome las medidas necesarias. Atentamente KEMAY GPS SATELITAL cuidando tu seguridad.`,
+        });
+        return await this.sendWhatsAppMessage({
+          ...body,
+          templateId: 'HXaed323d532c8f04489d834356a469969',
+        });
+
       default:
         return {
           success: false,
