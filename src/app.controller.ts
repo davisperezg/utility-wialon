@@ -10,6 +10,7 @@ import { AppService } from './app.service';
 import { CreateWhatsappDto } from './whatsapp/dto/create-whatsapp.dto';
 import { CreateCallDto } from './call/dto/create-call.dto';
 import { CreateWspCallDto } from './wsp_call/dto/create-wsp_call.dto';
+import { validarNumeroPeruano } from './utils/functions';
 
 @Controller()
 export class AppController {
@@ -25,7 +26,8 @@ export class AppController {
     const { to } = body;
     const recipients = Array.isArray(to) ? to : [to]; // Convertir en array si es solo un número
     console.log(recipients);
-    const phones = recipients.filter(Boolean);
+    const phones = recipients.filter(validarNumeroPeruano);
+    console.log(phones);
     const results = [];
 
     for (const phone of phones) {
