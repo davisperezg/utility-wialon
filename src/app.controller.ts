@@ -24,6 +24,7 @@ export class AppController {
   async sendNotificationMessage(@Body() body: CreateWspCallDto) {
     const { to } = body;
     const recipients = Array.isArray(to) ? to : [to]; // Convertir en array si es solo un número
+    console.log(recipients);
     const phones = recipients.filter(Boolean);
     const results = [];
 
