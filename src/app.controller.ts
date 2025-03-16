@@ -24,9 +24,10 @@ export class AppController {
   async sendNotificationMessage(@Body() body: CreateWspCallDto) {
     const { to } = body;
     const recipients = Array.isArray(to) ? to : [to]; // Convertir en array si es solo un número
+    const phones = recipients.filter(Boolean);
     const results = [];
 
-    for (const phone of recipients) {
+    for (const phone of phones) {
       try {
         const EASY = await this.appService.easyNotification({
           ...body,
@@ -53,9 +54,10 @@ export class AppController {
   async sendCallMessage(@Body() body: CreateCallDto) {
     const { to } = body;
     const recipients = Array.isArray(to) ? to : [to]; // Convertir en array si es solo un número
+    const phones = recipients.filter(Boolean);
     const results = [];
 
-    for (const phone of recipients) {
+    for (const phone of phones) {
       try {
         const CALL = await this.appService.makeVoiceCall({
           ...body,
@@ -82,9 +84,10 @@ export class AppController {
   async sendWhatsAppMessage(@Body() body: CreateWhatsappDto) {
     const { to } = body;
     const recipients = Array.isArray(to) ? to : [to]; // Convertir en array si es solo un número
+    const phones = recipients.filter(Boolean);
     const results = [];
 
-    for (const phone of recipients) {
+    for (const phone of phones) {
       try {
         const WSP = await this.appService.sendWhatsAppMessage({
           ...body,

@@ -63,7 +63,7 @@ export class AppService {
       case 'CRASH':
         await this.makeVoiceCall({
           to,
-          message: `ALERTA! comportamiento inusual en el GPS que indica un posible accidente del vehículo con placa ${vehicle}, comuníquese de inmediato con el conductor, tome las medidas necesarias. Atentamente KEMAY GPS SATELITAL cuidando tu seguridad.`,
+          message: `¡ALERTA! comportamiento inusual en el GPS que indica un posible accidente del vehículo con placa ${vehicle}, comuníquese de inmediato con el conductor, tome las medidas necesarias. Atentamente KEMAY GPS SATELITAL cuidando tu seguridad.`,
         });
         return await this.sendWhatsAppMessage({
           ...body,
