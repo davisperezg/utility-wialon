@@ -4,6 +4,7 @@ import { CreateWhatsappDto } from './whatsapp/dto/create-whatsapp.dto';
 import { CreateCallDto } from './call/dto/create-call.dto';
 import { CreateWspCallDto } from './wsp_call/dto/create-wsp_call.dto';
 import { validarNumeroPeruano } from './utils/functions';
+import { CreateWhatsappMaintenanceDto } from './whatsapp/dto/create-whatsapp-maintenance.dto';
 
 @Controller()
 export class AppController {
@@ -83,7 +84,39 @@ export class AppController {
 
     for (const phone of phones) {
       try {
-        const WSP = await this.appService.sendWhatsAppMessage({
+        const WSP = await this.appService.sendWhatsAppMessageParameters({
+          ...body,
+          to: phone,
+        });
+        results.push({
+          to: phone,
+          status: 'Sent',
+          response: WSP,
+        });
+      } catch (error) {
+        results.push({
+          to: phone,
+          status: 'Failed',
+          error: error.message,
+        });
+      }
+    }
+
+    return results;
+  }
+
+  @Post('wsp-maintenance-notification')
+  async sendWhatsAppMessageMaintenance(
+    @Body() body: CreateWhatsappMaintenanceDto,
+  ) {
+    const { to } = body;
+    const recipients = Array.isArray(to) ? to : [to]; // Convertir en array si es solo un número
+    const phones = recipients.filter(validarNumeroPeruano); // Filtrar solo números válidos
+    const results = [];
+
+    for (const phone of phones) {
+      try {
+        const WSP = await this.appService.sendWhatsAppMessageMaintenance({
           ...body,
           to: phone,
         });

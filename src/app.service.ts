@@ -6,6 +6,7 @@ import { MessageListInstanceCreateOptions } from 'twilio/lib/rest/api/v2010/acco
 import { CallListInstanceCreateOptions } from 'twilio/lib/rest/api/v2010/account/call';
 import { CreateCallDto } from './call/dto/create-call.dto';
 import { CreateWspCallDto } from './wsp_call/dto/create-wsp_call.dto';
+import { CreateWhatsappMaintenanceDto } from './whatsapp/dto/create-whatsapp-maintenance.dto';
 
 @Injectable()
 export class AppService {
@@ -45,7 +46,7 @@ export class AppService {
           to,
           message: `¡ALERTA! dispositivo desconectado! placa ${vehicle}. Atentamente KEMAY GPS SATELITAL cuidando tu seguridad`,
         });
-        return await this.sendWhatsAppMessage({
+        return await this.sendWhatsAppMessageParameters({
           ...body,
           templateId: 'HX71df37a69d102827ed673fe7167fe1a6',
         });
@@ -55,7 +56,7 @@ export class AppService {
           to,
           message: `¡EMERGENCIA! Boton de panico activado placa ${vehicle}, comunicarse con el conductor urgente. Atentamente KEMAY GPS SATELITAL cuidando tu seguridad.`,
         });
-        return await this.sendWhatsAppMessage({
+        return await this.sendWhatsAppMessageParameters({
           ...body,
           templateId: 'HXc1a31cd1b7667ebb986ecb0988d2e72d',
         });
@@ -65,7 +66,7 @@ export class AppService {
           to,
           message: `¡ALERTA! comportamiento inusual en el GPS que indica un posible accidente del vehículo con placa ${vehicle}, comuníquese de inmediato con el conductor, tome las medidas necesarias. Atentamente KEMAY GPS SATELITAL cuidando tu seguridad.`,
         });
-        return await this.sendWhatsAppMessage({
+        return await this.sendWhatsAppMessageParameters({
           ...body,
           templateId: 'HXaed323d532c8f04489d834356a469969',
         });
@@ -79,7 +80,7 @@ export class AppService {
     }
   }
 
-  async sendWhatsAppMessage(body: CreateWhatsappDto): Promise<any> {
+  async sendWhatsAppMessageParameters(body: CreateWhatsappDto): Promise<any> {
     const { to, vehicle, currentTime, location, templateId } = body;
     this.logger.log(`Intentando enviar mensaje WhatsApp a: ${to}`);
 
@@ -107,6 +108,67 @@ export class AppService {
         from,
         to: formattedTo,
         contentVariables: `{"1":"${vehicle.trim()}","2":"${currentTime.trim()}","3":"${locationDefault}"}`,
+      };
+
+      // Registrar datos antes de enviar
+      this.logger.debug('Enviando whatsapp con los siguientes datos.', params);
+
+      // Enviar el mensaje
+      const result = await this.twilioClient.messages.create(params);
+
+      this.logger.log(`Whatsapp enviado exitosamente, SID: ${result.sid}`);
+
+      return {
+        success: true,
+        messageId: result.sid,
+        status: result.status,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      this.logger.error(
+        `Error al enviar mensaje de WhatsApp: ${error.message}`,
+        {
+          stack: error.stack,
+          errorCode: error.code,
+          to,
+        },
+      );
+
+      return {
+        success: false,
+        error: error.message,
+        errorCode: error.code || 'UNKNOWN_ERROR',
+      };
+    }
+  }
+
+  async sendWhatsAppMessageMaintenance(
+    body: CreateWhatsappMaintenanceDto,
+  ): Promise<any> {
+    const { to, vehicle, templateId, cotiza, service_term, user } = body;
+    this.logger.log(`Intentando enviar mensaje WhatsApp a: ${to}`);
+
+    try {
+      // Validar número de teléfono
+      if (!this.isValidPhoneNumber(to)) {
+        this.logger.warn(`Número de teléfono inválido: ${to}`);
+        return {
+          success: false,
+          error: 'Número de teléfono inválido',
+        };
+      }
+
+      const formattedTo = to.startsWith('whatsapp:') ? to : `whatsapp:+${to}`;
+      const from = `whatsapp:${this.configService.get<string>(
+        'TWILIO_PHONE_NUMBER',
+      )}`;
+
+      const params: MessageListInstanceCreateOptions = {
+        messagingServiceSid: this.serviceId,
+        contentSid: templateId,
+        from,
+        to: formattedTo,
+        contentVariables: `{"1":"${user.trim()}","2":"${vehicle.trim()}","3":"${service_term.trim()}","4":"${cotiza.trim()}"}`,
       };
 
       // Registrar datos antes de enviar
